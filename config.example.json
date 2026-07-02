@@ -1,7 +1,7 @@
 {
   "_comment": "Copy to config.json and fill in. config.json is gitignored — never commit credentials.",
 
-  "mt5_symbol": "EURUSD",
+  "mt5_symbols": ["EURUSD", "GBPUSD", "USDJPY"],
   "mt5_login": 12345678,
   "mt5_password": "your-mt5-investor-or-master-password",
   "mt5_server": "YourPropFirm-Server",
@@ -11,7 +11,12 @@
   "telegram_chat_id": "123456789",
 
   "risk_per_trade": 0.01,
+  "max_portfolio_risk": 0.02,
+  "max_same_usd_exposure": 1,
   "max_drawdown": 0.05,
   "daily_loss_limit": 0.03,
-  "profit_target": 0.10
+  "profit_target": 0.10,
+
+  "news_filter_enabled": true,
+  "news_blackout_minutes": 45
 }

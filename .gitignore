@@ -3,3 +3,6 @@ __pycache__/
 config.json
 live_state.json
 output/live_signals.csv
+output/heartbeat.json
+output/watchdog_state.json
+output/news_calendar_cache.json

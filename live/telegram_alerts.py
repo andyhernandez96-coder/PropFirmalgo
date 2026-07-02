@@ -33,12 +33,12 @@ def send_telegram(cfg, text):
         return False
 
 
-def format_signal(direction, symbol, entry, sl, tp, units, risk_pct, reason=""):
+def format_signal(direction, symbol, entry, sl, tp, risk_amount, risk_pct,
+                  reason=""):
     arrow = "🟢 LONG" if direction == 1 else "🔴 SHORT"
-    lots = units / 100_000
     return (f"<b>{arrow} {symbol}</b>\n"
             f"Entry ≈ {entry:.5f}\n"
             f"Stop   = {sl:.5f}\n"
             f"Target = {tp:.5f}\n"
-            f"Size   = {lots:.2f} lots ({risk_pct:.1f}% risk)\n"
+            f"Risk   = ${risk_amount:,.0f} ({risk_pct:.1f}% of equity)\n"
             f"{reason}")

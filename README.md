@@ -38,6 +38,37 @@ or run `--loop` inside a service. The prop-firm guard (5% kill switch, 3%
 daily stop, +10% target lock) executes before any trading logic every cycle
 and persists across restarts via `live_state.json`.
 
+### Multi-symbol portfolio
+
+Trade several majors at once via `"mt5_symbols": ["EURUSD", "GBPUSD", "USDJPY"]`
+in config.json. Two portfolio guards keep diversification from becoming
+concentration: total open risk is capped (`max_portfolio_risk`, default 2%),
+and only one position per USD-exposure direction is allowed
+(`max_same_usd_exposure`) — EURUSD long + GBPUSD long is the same macro bet,
+so the second one is skipped and logged.
+
+### News blackout filter
+
+No entries within ±45 minutes of high-impact scheduled releases (NFP, CPI,
+FOMC...) for either of the pair's currencies — spreads around news blow out
+far past the backtest's cost assumptions, and prop firms flag news-spike P&L.
+The calendar comes from ForexFactory's free weekly feed, cached to disk; if
+it's unreachable the filter fails open with a loud warning. Exits and the
+kill switch are never blocked. Configure via `news_filter_enabled` /
+`news_blackout_minutes`.
+
+### Watchdog (dead-man's switch)
+
+The kill switch protects you from bad trades; the watchdog protects you from
+a dead process. `live_trader.py` writes `output/heartbeat.json` every cycle;
+`live/watchdog.py` runs as a *separate* scheduled task (every 15 min) and
+Telegram-alerts you when the heartbeat goes stale during market hours, when
+equity drops >1% between checks, or when a halt state is reported:
+
+```bash
+python live/watchdog.py        # schedule independently of the trader
+```
+
 ## AI research loop (study + improve the strategy)
 
 ```bash
@@ -71,7 +102,9 @@ every report accordingly. Outputs land in `./output/`:
 |---|---|
 | `trading_algorithm.py` | Complete pipeline: data → indicators → signals → risk-managed backtest → prop firm report |
 | `live/live_trader.py` | Hourly live loop: MT5 data → signal → Telegram alert and/or MT5 order, prop-firm guard first |
-| `live/mt5_client.py` | MetaTrader 5 wrapper + PaperBroker for dry-runs on any OS |
+| `live/mt5_client.py` | Multi-symbol MetaTrader 5 wrapper + PaperBroker for dry-runs on any OS |
+| `live/news_filter.py` | High-impact news blackout (ForexFactory calendar, cached, fails open) |
+| `live/watchdog.py` | Dead-man's switch: alerts if the trader's heartbeat goes stale |
 | `live/telegram_alerts.py` | Signal notifications to your phone |
 | `research/walk_forward.py` | Rolling out-of-sample re-optimization; the adoption gate for all changes |
 | `research/ai_analyst.py` | Claude-powered diagnosis + hypothesis generation, validated by the lab |
