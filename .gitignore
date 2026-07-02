@@ -6,3 +6,6 @@ output/live_signals.csv
 output/heartbeat.json
 output/watchdog_state.json
 output/news_calendar_cache.json
+output/report_state.json
+output/equity_history.csv
+output/weekly_equity_chart.png

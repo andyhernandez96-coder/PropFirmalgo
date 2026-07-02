@@ -175,17 +175,22 @@ class MT5Broker:
         for pos in self.positions_all():
             self.close_position(pos["symbol"], reason)
 
+    def closed_deals(self, since):
+        """All closes by this bot since `since`, with full P&L (profit +
+        commission + swap — the number the prop firm actually sees)."""
+        deals = mt5.history_deals_get(since, datetime.now(timezone.utc)) or []
+        out = []
+        for d in deals:
+            if d.magic == self.magic and d.entry == mt5.DEAL_ENTRY_OUT:
+                out.append({"symbol": d.symbol,
+                            "pnl": d.profit + d.commission + d.swap,
+                            "time": datetime.fromtimestamp(d.time,
+                                                           tz=timezone.utc)})
+        return sorted(out, key=lambda x: x["time"])
+
     def recent_stop_outs(self, since):
         """Losing closes since `since` — feeds the per-symbol cool-down."""
-        deals = mt5.history_deals_get(since, datetime.now(timezone.utc)) or []
-        outs = []
-        for d in deals:
-            if (d.magic == self.magic and d.entry == mt5.DEAL_ENTRY_OUT
-                    and d.profit < 0):
-                outs.append({"symbol": d.symbol, "profit": d.profit,
-                             "time": datetime.fromtimestamp(d.time,
-                                                            tz=timezone.utc)})
-        return outs
+        return [d for d in self.closed_deals(since) if d["pnl"] < 0]
 
     def shutdown(self):
         mt5.shutdown()
@@ -271,6 +276,11 @@ class PaperBroker:
     def close_all(self, reason=""):
         for symbol in list(self._pos):
             self.close_position(symbol, reason)
+
+    def closed_deals(self, since):
+        return [{"symbol": t["symbol"], "pnl": t["pnl"], "time": t["exit_time"]}
+                for t in self.closed_trades
+                if pd.Timestamp(t["exit_time"]) >= since]
 
     def recent_stop_outs(self, since):
         return [{"symbol": t["symbol"], "profit": t["pnl"], "time": t["exit_time"]}

@@ -69,6 +69,20 @@ equity drops >1% between checks, or when a halt state is reported:
 python live/watchdog.py        # schedule independently of the trader
 ```
 
+### Daily / weekly reports
+
+A scoreboard sent to your phone instead of reconstructing performance from
+raw logs. Every day: trades closed, today's P&L by symbol, and distance to
+the +10%/-5% challenge boundaries. Every Sunday: the same, plus a real
+equity-curve chart built from `output/equity_history.csv`. Reads MT5's own
+deal history (profit + commission + swap — what the prop firm actually
+sees), not an approximation.
+
+```bash
+python live/daily_report.py          # schedule once/day, e.g. 21:05 UTC
+python live/daily_report.py --test   # preview the format with fake data
+```
+
 ## AI research loop (study + improve the strategy)
 
 ```bash
@@ -105,6 +119,7 @@ every report accordingly. Outputs land in `./output/`:
 | `live/mt5_client.py` | Multi-symbol MetaTrader 5 wrapper + PaperBroker for dry-runs on any OS |
 | `live/news_filter.py` | High-impact news blackout (ForexFactory calendar, cached, fails open) |
 | `live/watchdog.py` | Dead-man's switch: alerts if the trader's heartbeat goes stale |
+| `live/daily_report.py` | Daily/weekly performance scoreboard + equity chart to Telegram |
 | `live/telegram_alerts.py` | Signal notifications to your phone |
 | `research/walk_forward.py` | Rolling out-of-sample re-optimization; the adoption gate for all changes |
 | `research/ai_analyst.py` | Claude-powered diagnosis + hypothesis generation, validated by the lab |
