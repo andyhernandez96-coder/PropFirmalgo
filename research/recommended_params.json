@@ -1,0 +1,16 @@
+{
+  "source": "grid_bb_std=1.5_stop_atr_mult=1.25_min_rr=0.6",
+  "params": {
+    "bb_std": 1.5,
+    "stop_atr_mult": 1.25,
+    "min_rr": 0.6
+  },
+  "evidence": {
+    "candidate": "grid_bb_std=1.5_stop_atr_mult=1.25_min_rr=0.6",
+    "folds": 9,
+    "oos_sum_r_total": 13.18,
+    "oos_median_r": 1.92,
+    "beats_baseline_folds": 6,
+    "enough_trades": true
+  }
+}

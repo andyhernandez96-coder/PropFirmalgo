@@ -1,0 +1,17 @@
+{
+  "_comment": "Copy to config.json and fill in. config.json is gitignored — never commit credentials.",
+
+  "mt5_symbol": "EURUSD",
+  "mt5_login": 12345678,
+  "mt5_password": "your-mt5-investor-or-master-password",
+  "mt5_server": "YourPropFirm-Server",
+  "mt5_magic": 970431,
+
+  "telegram_token": "123456:ABC-your-botfather-token",
+  "telegram_chat_id": "123456789",
+
+  "risk_per_trade": 0.01,
+  "max_drawdown": 0.05,
+  "daily_loss_limit": 0.03,
+  "profit_target": 0.10
+}

@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+config.json
+live_state.json
+output/live_signals.csv

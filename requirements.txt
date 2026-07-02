@@ -2,3 +2,9 @@ pandas>=2.0
 numpy>=1.24
 matplotlib>=3.7
 yfinance>=0.2.40
+
+# Live trading (MT5 python API is Windows-only — installed only there)
+MetaTrader5>=5.0.45; sys_platform == "win32"
+
+# AI strategy analyst
+anthropic>=0.40
