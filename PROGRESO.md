@@ -1,14 +1,14 @@
 # Progreso — Network+ (N10-009) → CCNA (200-301)
 
 **Fase actual:** 1 — Network+ N10-009
-**Estado:** plan cargado, sin sesiones completadas todavía.
+**Estado:** Semana 1 en curso. Día 1 entregado, pendiente de que Andy reporte score.
 
 ## Fase 1 — Network+ (3 semanas)
 
 ### Semana 1 — Fundamentos
 | Día | Tema | Estado | Score práctica | Notas / temas flojos |
 |-----|------|--------|----------------|----------------------|
-| 1 | Modelo OSI / TCP-IP | pendiente | — | — |
+| 1 | Modelo OSI / TCP-IP | entregado | pendiente | ver `sesiones/network-plus/dia01-modelo-osi-tcpip.md` |
 | 2 | Tipos de red y topologías (repaso rápido) | pendiente | — | — |
 | 3 | IP addressing fundamentals | pendiente | — | — |
 | 4 | Subnetting IPv4 (drills a mano) | pendiente | — | — |
