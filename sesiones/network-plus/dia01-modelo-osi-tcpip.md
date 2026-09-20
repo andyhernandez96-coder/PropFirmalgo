@@ -302,5 +302,226 @@ Mapeo: Application (OSI 5-6-7), Transport (4), Internet (3), Network Access (2-1
 
 ## Resultado
 
+**Score: 10/15 (67%)** — por debajo del umbral estimado de aprobado (~75-80% de
+aciertos; CompTIA no publica la conversión exacta a la escala 100-900).
+
+Fallos: 2, 8, 10, 11, 13.
+
+### Patrón de error
+
+Identifica bien la **función** de cada capa, pero falla al mapear **objetos
+concretos** a capas y al leer qué capa está **confirmada** en un escenario.
+
+Señal clara: acertó el orden completo de encapsulación (P6) y falló el nombre de
+la PDU de transporte (P2). Secuencia memorizada sin atar al número de capa.
+
+| Fallo | Tipo de error |
+|-------|---------------|
+| 2 (PDU) | Nomenclatura PDU <-> capa |
+| 8 (LB), 11 (ICMP) | Mapeo objeto -> capa |
+| 10 (TCP/IP) | Estructura del modelo TCP/IP |
+| 13 (escenario) | Confirmado vs. fallido |
+
+El fallo 13 es el prioritario: Troubleshooting pesa 24% del examen.
+
+## Remediales
+
+### 1. PDU <-> capa (fallo 2)
+
+La PDU se llama por la última cabecera añadida:
+
+- L4 añade puertos -> **Segmento** (TCP) / **Datagrama** (UDP)
+- L3 añade IPs -> **Paquete**
+- L2 añade MACs + FCS -> **Trama**
+
+**4-3-2 = Segmento, Paquete, Trama.**
+
+Anclaje: en Wireshark cada línea es una trama; dentro el paquete IP; dentro el
+segmento TCP.
+
+### 2. Regla universal de "¿en qué capa opera X?" (fallos 8 y 11)
+
+No preguntes "qué es este dispositivo". Pregunta **qué campo tiene que leer para
+hacer su trabajo**:
+
+| Lo que necesita leer | Capa |
+|----------------------|------|
+| URL, cabecera HTTP, cookie, hostname | 7 |
+| Número de puerto TCP/UDP | 4 |
+| Dirección IP | 3 |
+| Dirección MAC | 2 |
+
+- P8: para separar /api hay que leer la URL -> L7. Un LB L4 solo ve "puerto 443".
+- P11: ICMP no tiene puerto (usa tipo/código) y va sobre IP -> L3.
+
+Error de raíz en P11: confundir **la herramienta con el protocolo**. `ping` es un
+ejecutable de usuario, pero lo que sale por el cable es ICMP sobre IP. Igual con
+`traceroute`.
+
+### 3. Modelo TCP/IP (fallo 10)
+
+TCP/IP tiene una capa **Transport propia y separada**. Si Transport ya existe,
+Application no puede incluir también la L4 — sería contar la función dos veces.
+
+| TCP/IP | OSI |
+|--------|-----|
+| Application | 7, 6, 5 |
+| Transport | 4 |
+| Internet | 3 |
+| Network Access / Link | 2, 1 |
+
+### 4. Confirmado vs. fallido (fallo 13) — el más rentable
+
+**Nunca puede haber una capa superior confirmada por encima de una capa que
+falló.** Las capas altas dependen de las bajas; si L4 no se establece, L5-L7 ni
+llegaron a ejecutarse.
+
+Lectura del escenario P13:
+1. Ping responde desde otra subred -> paquete IP enrutado ida y vuelta -> **L3
+   confirmada** (y por dependencia L2, L1).
+2. SYN al 443 sin SYN-ACK -> handshake intentado y no completado -> **L4 fallida**.
+3. Conclusión: más alto confirmado L3, fallo en L4.
+
+Causas L4 posibles: servicio no escucha, ACL/firewall descarta el SYN, RST.
+
+**Regla operativa: "confirmado" = completó su función de extremo a extremo.**
+Un ping que responde confirma L3 y nada más.
+
+## Drill de refuerzo (10 preguntas)
+
+Solo sobre los 5 puntos débiles.
+
+1. Un analizador captura tráfico. La unidad que ya contiene la cabecera IP pero
+   todavía no la cabecera Ethernet se denomina:
+   a) Trama  b) Paquete  c) Segmento  d) Datagrama
+
+2. Una aplicación de streaming envía tráfico sobre UDP. ¿Cómo se denomina la PDU
+   de capa 4 en ese caso?
+   a) Segmento  b) Paquete  c) Datagrama  d) Trama
+
+3. Un switch multicapa con SVIs enruta tráfico entre la VLAN 10 y la VLAN 20.
+   ¿En qué capa opera al realizar esa función?
+   a) Capa 1  b) Capa 2  c) Capa 3  d) Capa 4
+
+4. Un host envía una solicitud ARP para resolver una IP de su misma subred.
+   Según el tratamiento habitual de CompTIA, ¿en qué capa opera ARP?
+   a) Capa 1  b) Capa 2  c) Capa 3  d) Capa 4
+
+5. Un proxy inverso examina la cabecera Host: de las peticiones entrantes para
+   decidir el backend de destino. ¿En qué capa opera?
+   a) Capa 3  b) Capa 4  c) Capa 6  d) Capa 7
+
+6. En el modelo TCP/IP, ¿a qué capa corresponde la capa 4 del OSI?
+   a) Application  b) Transport  c) Internet  d) Network Access
+
+7. La capa Network Access (Link) del modelo TCP/IP agrupa qué capas del OSI?
+   a) Solo la 1  b) Capas 1 y 2  c) Capas 1, 2 y 3  d) Capas 2 y 3
+
+8. Un usuario se conecta por RDP. El ping responde, DNS resuelve, la conexión TCP
+   al 3389 se establece con handshake completo, pero el servidor rechaza las
+   credenciales. ¿En qué capa está el fallo?
+   a) Capa 3  b) Capa 4  c) Capa 6  d) Capa 7
+
+9. Un servidor no responde a ping desde ningún host. El puerto está up/up y la MAC
+   aparece en la tabla del switch en la VLAN esperada. ¿Qué está confirmado y
+   dónde buscar?
+   a) Confirmadas 1 y 2; buscar en capa 3
+   b) Confirmada solo la 1; buscar en capa 2
+   c) Confirmadas 1, 2 y 3; buscar en capa 4
+   d) Confirmadas 1, 2 y 3; buscar en capa 7
+
+10. Un técnico afirma: "la aplicación web funciona porque el servidor responde al
+    ping". ¿Por qué es incorrecto?
+    a) Porque el ping usa TCP y la web usa UDP
+    b) Porque el ping solo confirma hasta la capa 3, y el servicio web depende
+       además de las capas 4 y 7
+    c) Porque el ping confirma la capa 7 pero no las inferiores
+    d) Porque ICMP y HTTP usan números de puerto distintos
+
+## Answer Key del drill
+
+**1. Correcta: b) Paquete**
+- b): la PDU se nombra por la última cabecera añadida; con IP presente y Ethernet
+  ausente es un paquete de capa 3.
+- a) mal: sería trama solo tras añadir cabecera MAC y trailer FCS, y el enunciado
+  dice que Ethernet aún no está.
+- c) mal: el segmento es la unidad *antes* de añadir la cabecera IP.
+- d) mal: datagrama es la PDU de capa 4 con UDP, no una unidad de capa 3.
+
+**2. Correcta: c) Datagrama**
+- c): con UDP la PDU de L4 se llama datagrama. Es el matiz que faltó en P2.
+- a) mal: "segmento" corresponde a TCP; ambos son L4 pero CompTIA distingue el
+  nombre según el protocolo.
+- b) mal: el paquete es L3, sea cual sea el transporte.
+- d) mal: la trama es L2 y tampoco depende del transporte.
+
+**3. Correcta: c) Capa 3**
+- c): cruzar de la VLAN 10 a la 20 exige consultar la IP de destino y enrutar.
+  Por eso el dispositivo se llama switch *multicapa*.
+- a) mal: la capa 1 no lee direcciones.
+- b) mal: conmutar dentro de una misma VLAN sí es L2, pero una VLAN es por
+  definición un dominio de broadcast separado; cruzarlas requiere enrutamiento.
+- d) mal: no hay decisión por número de puerto en el enunciado.
+
+**4. Correcta: b) Capa 2**
+- b): zona gris declarada. ARP resuelve L3 -> L2 y CompTIA lo sitúa habitualmente
+  en capa 2. Si el examen enfrenta 2 contra 3, marca 2.
+- a) mal: la capa 1 no maneja direcciones.
+- c) mal: defendible técnicamente (ARP trabaja con IPs) pero no es la respuesta
+  esperada por CompTIA.
+- d) mal: ARP no usa puertos ni protocolo de transporte.
+
+**5. Correcta: d) Capa 7**
+- d): la cabecera Host: es parte de la petición HTTP; leerla exige inspeccionar el
+  payload -> L7.
+- a) mal: una decisión L3 solo miraría la IP, y varios hostnames comparten IP —
+  ese es justamente el escenario que el proxy resuelve.
+- b) mal: L4 ve el puerto 80/443, idéntico para todos los hostnames.
+- c) mal: si hay TLS, el proxy termina el cifrado (L6) *para poder* leer L7; la
+  decisión sigue siendo L7.
+
+**6. Correcta: b) Transport**
+- b): correspondencia uno a uno; TCP y UDP en ambos modelos.
+- a) mal: error de P10 original. Application agrupa 5, 6 y 7, nunca la 4, porque
+  Transport ya existe como capa separada.
+- c) mal: Internet corresponde a la capa 3 (IP, ICMP, enrutamiento).
+- d) mal: Network Access corresponde a las capas 2 y 1.
+
+**7. Correcta: b) Capas 1 y 2**
+- b): agrupa acceso al medio y entrega local — física y enlace de datos.
+- a) mal: dejaría la capa 2 sin correspondencia, y Ethernet/MACs tienen que estar
+  en alguna capa del modelo.
+- c) mal: incluye la 3, que en TCP/IP es su propia capa (Internet).
+- d) mal: omite la 1 e incluye incorrectamente la 3.
+
+**8. Correcta: d) Capa 7**
+- d): el enunciado confirma L3 (ping), resolución de nombres y L4 (handshake
+  completo). Solo falla la autenticación, dentro del diálogo de aplicación -> L7.
+- a) mal: el ping responde, L3 confirmada.
+- b) mal: el handshake se completó; L4 cumplió su función.
+- c) mal: no hay nada sobre cifrado, formato ni codificación.
+
+Contraste con P13 del examen original: allí el handshake **no** se completaba y el
+fallo era L4; aquí sí se completa y el fallo sube a L7. Los separa una sola línea
+del enunciado.
+
+**9. Correcta: a) Confirmadas 1 y 2; buscar en capa 3**
+- a): up/up confirma L1; MAC aprendida en la VLAN correcta confirma L2. El ping
+  falla, así que L3 no está confirmada: revisar IP, máscara, gateway o firewall
+  del host.
+- b) mal: infravalora lo confirmado; la MAC en la tabla del switch prueba L2.
+- c) mal: L3 no puede estar confirmada cuando el ping, que es la prueba de L3,
+  está fallando.
+- d) mal: mismo error que c), y además salta a L7 con el fallo mucho más abajo.
+
+**10. Correcta: b)**
+- b): un ping confirma alcanzabilidad por IP y nada más. El servicio web puede
+  estar caído, el 443 filtrado o el proceso sin arrancar, y el ping respondería
+  igual.
+- a) mal: premisa falsa doble — ping usa ICMP, no TCP; HTTP/HTTPS usan TCP, no UDP.
+- c) mal: invierte el razonamiento; el ping confirma capas bajas, nunca la 7.
+- d) mal: premisa falsa — ICMP no usa números de puerto.
+
+### Resultado del drill
+
 - Score: pendiente (Andy resuelve y reporta)
-- Temas flojos detectados: pendiente
