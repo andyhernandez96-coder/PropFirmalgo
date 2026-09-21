@@ -702,4 +702,77 @@ responde = capa 3 confirmada, ni una más.
    c) Porque el ping confirma la capa 7 pero no las inferiores
    d) Porque el correo no usa direcciones IP
 
+**Score: 3/6.** Fallos: 1, 2, 4. Correctas: 3, 5, 6.
+
+## DIAGNÓSTICO — problema de método, no de comprensión
+
+Separación nítida entre los aciertos y los fallos:
+
+- **Acertó** 3, 5 y 6 -> las tres exigen **razonar** una cadena lógica.
+- **Falló** 1, 2 y 4 -> las tres son **datos de recuerdo directo**.
+
+Conclusión: entiende el material (lo demuestra cuando hay que razonar), pero **no
+retiene nada**. Causa: tres rondas leyendo explicaciones y respondiendo opción
+múltiple. Leer produce sensación de dominio por reconocimiento; la opción
+múltiple lo refuerza porque enseña la respuesta entre las cuatro.
+
+Prueba concluyente: la P1 estaba marcada en negrita como "el único concepto
+imprescindible del Día 1" y se falló dos minutos después de leerla.
+
+Factor agravante del tutor: ~40 datos sueltos en una sola sesión. Dosis
+imposible de retener.
+
+**Cambio de método a partir de aquí:**
+1. Recuerdo activo (respuesta producida desde cero), no reconocimiento.
+2. Repaso espaciado a lo largo de varios días.
+3. Reducir a un núcleo mínimo de hechos por sesión.
+
+Ver `flashcards-dia01.md`.
+
+## Núcleo mínimo del Día 1 — 8 hechos
+
+| # | Pregunta | Respuesta |
+|---|----------|-----------|
+| 1 | ¿Qué es la IP y cambia durante el viaje? | A dónde va. **No cambia.** |
+| 2 | ¿Qué es la MAC y cambia durante el viaje? | Quién lo tiene ahora. **Cambia en cada salto.** |
+| 3 | Capa 4 — dato y PDU | El **puerto**. Segmento (TCP) / Datagrama (UDP) |
+| 4 | Capa 3 — dato y PDU | La **IP**. Paquete |
+| 5 | Capa 2 — dato y PDU | La **MAC**. Trama |
+| 6 | ¿Qué hay en la capa 7? | Contenido del programa: contraseñas, direcciones web, archivos |
+| 7 | Las 4 capas de TCP/IP | Application (7,6,5) · Transport (4) · Internet (3) · Network Access (2,1) |
+| 8 | ¿Qué confirma un ping que responde? | Solo la capa 3. Nada por encima. |
+
+### Correcciones de los 3 fallos
+
+**P1 — IP vs. MAC.** La analogía postal era demasiado elaborada. Versión corta:
+> **IP = ¿a dónde va?** No cambia nunca mientras viaja.
+> **MAC = ¿quién lo tiene ahora mismo?** Cambia constantemente.
+
+**P2 — UDP.** Fallo del tutor por no decirlo antes: **UDP = User Datagram
+Protocol**. La palabra "Datagrama" está dentro del acrónimo. Nada que memorizar.
+
+**P4 — La IP es capa 3.** Enganche a la escalera ya conocida:
+> La IP va dentro del **Paquete**, y Paquete = capa **3**.
+
+Tercera vez que elige capa 4 al dudar. Regla correctiva: *si el enunciado no
+menciona un puerto ni un programa, no es capa 4.*
+
+## Práctica final — recuerdo abierto (8 preguntas, sin opciones)
+
+Formato deliberadamente sin opciones: hay que **producir** la respuesta, no
+reconocerla. Tapar la tabla antes de empezar; si no sale, escribir "no sé" en
+lugar de ir a buscarla.
+
+1. Un mensaje viaja de Madrid a Chicago. ¿Qué le pasa a la dirección IP durante
+   el trayecto, y por qué?
+2. Un mensaje viaja de Madrid a Chicago. ¿Qué le pasa a la dirección MAC durante
+   el trayecto, y por qué?
+3. ¿Qué significan las siglas UDP, y qué te dice eso sobre el nombre de su PDU?
+4. Nombra las PDU de las capas 4, 3 y 2, en ese orden.
+5. ¿Qué dato mira un aparato de capa 3 para hacer su trabajo? ¿Y uno de capa 2?
+6. Enumera las 4 capas de TCP/IP y di qué capas del OSI agrupa cada una.
+7. Un servidor responde al ping. ¿Qué has confirmado y qué NO has confirmado?
+8. Alguien accede a una web, la página carga bien, escribe su contraseña y el
+   sistema la rechaza. ¿En qué capa está el fallo y por qué?
+
 - Score: pendiente (Andy resuelve y reporta)

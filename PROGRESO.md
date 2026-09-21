@@ -1,14 +1,16 @@
 # Progreso — Network+ (N10-009) → CCNA (200-301)
 
 **Fase actual:** 1 — Network+ N10-009
-**Estado:** Semana 1 en curso. Día 1: examen 10/15, drill 5/10. Reset pedagógico aplicado (nivel principiante absoluto en todo lo que no sea hardware). Comprobación final de 6 preguntas pendiente.
+**Estado:** Semana 1, Día 1 sin cerrar. Examen 10/15, drill 5/10, comprobación 3/6.
+Cambio de método a recuerdo activo + repaso espaciado (ver `flashcards-dia01.md`).
+No avanzar al Día 2 hasta 8/8 en las flashcards, dos pasadas seguidas.
 
 ## Fase 1 — Network+ (3 semanas)
 
 ### Semana 1 — Fundamentos
 | Día | Tema | Estado | Score práctica | Notas / temas flojos |
 |-----|------|--------|----------------|----------------------|
-| 1 | Modelo OSI / TCP-IP | en refuerzo | **10/15 → drill 5/10** | Re-explicado desde cero con analogía postal. Persiste: modelo TCP/IP, PDU de UDP, L3 vs L4 |
+| 1 | Modelo OSI / TCP-IP | **bloqueante** | 10/15 → 5/10 → 3/6 | Reducido a 8 hechos núcleo + flashcards. Persiste: IP vs MAC en tránsito, PDU de UDP, IP=L3 |
 | 2 | Tipos de red y topologías (repaso rápido) | pendiente | — | — |
 | 3 | IP addressing fundamentals | pendiente | — | — |
 | 4 | Subnetting IPv4 (drills a mano) | pendiente | — | — |
@@ -52,6 +54,24 @@ Bloqueada hasta que Andy diga explícitamente **"pasamos a CCNA"**.
 | Network Security | 14% | sin evaluar |
 | Network Troubleshooting | 24% | punto débil: confunde capa confirmada con capa fallida |
 
+## MÉTODO DE ESTUDIO (crítico — cambiado tras el Día 1)
+
+Diagnóstico del Día 1: **acierta las preguntas de razonamiento y falla las de
+recuerdo directo.** No es un problema de comprensión sino de retención — leer
+explicaciones y responder opción múltiple produce reconocimiento, no memoria.
+
+Reglas para todas las sesiones siguientes:
+
+1. **Máximo ~8-10 hechos núcleo por sesión.** Todo lo demás es contexto, no se
+   evalúa. El Día 1 soltó ~40 datos sueltos: dosis imposible de retener.
+2. **Cerrar cada sesión con flashcards** en `sesiones/network-plus/flashcards-diaXX.md`.
+3. **Incluir siempre preguntas de recuerdo abierto** (sin opciones), no solo
+   opción múltiple.
+4. **No avanzar de día** hasta 8/8 en las flashcards del día anterior, dos
+   pasadas seguidas.
+5. **Repaso espaciado**: cada sesión empieza con una pasada rápida a las
+   flashcards de los días previos.
+
 ## Calibración de nivel (crítico)
 
 La experiencia de data center de Andy fue **netamente hardware**: sin
@@ -69,7 +89,17 @@ configuración, sin troubleshooting, sin Wireshark ni CLI de equipos de red.
 2. **Herramienta vs. protocolo** — `ping`/`traceroute` son ejecutables de usuario,
    pero el protocolo en el cable es ICMP sobre IP (L3).
 3. **PDU por número de capa** — 4-3-2 = Segmento, Paquete, Trama. UDP -> datagrama.
-4. **Tendencia a elegir L4 sin motivo** — si el enunciado no menciona puertos ni
-   programas, la capa 4 casi nunca es la respuesta.
-5. **Confirmado vs. fallido** — nunca hay capa superior confirmada por encima de
+4. **Tendencia a elegir L4 al dudar** — fallado 3 veces. Regla: si el enunciado no
+   menciona un puerto ni un programa, NO es capa 4.
+5. **"Segmento" para UDP** — fallado 3 veces. UDP = User **Datagram** Protocol.
+6. **IP vs MAC en tránsito** — la IP no cambia (a dónde va), la MAC cambia en cada
+   salto (quién lo tiene ahora).
+7. **Confirmado vs. fallido** — nunca hay capa superior confirmada por encima de
    una capa que falló.
+
+## Nota de calendario
+
+Con el punto de partida real (sin experiencia de configuración) y el ritmo del
+Día 1, las 3 semanas del plan original no son realistas. Estimación honesta:
+**4-5 semanas** al mismo ritmo semanal de horas. Decisión de Andy; si mantiene
+las 3 semanas, no volver a sacar el tema.
