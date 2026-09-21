@@ -524,4 +524,182 @@ del enunciado.
 
 ### Resultado del drill
 
+**Score: 5/10.** Fallos: 2, 3, 6, 7, 8.
+
+| # | Respuesta de Andy | Correcta |
+|---|-------------------|----------|
+| 1 | B | B |
+| 2 | A | C |
+| 3 | D | C |
+| 4 | B | B |
+| 5 | D | D |
+| 6 | A | B |
+| 7 | C | B |
+| 8 | C | D |
+| 9 | A | A |
+| 10 | B | B |
+
+Los fallos 6 y 7 son el modelo TCP/IP: el mismo error que en P10 del examen
+original. No se fijó porque se dio una tabla para memorizar en lugar de un
+modelo mental.
+
+## RESET PEDAGÓGICO — calibración de nivel
+
+Andy corrigió una asunción incorrecta del tutor: su experiencia de data center
+fue **netamente hardware**. Nunca hizo configuración ni troubleshooting, nunca
+usó Wireshark ni CLI de equipos de red.
+
+El Día 1 se explicó usando Wireshark, `up/up`, tablas MAC, SVIs, ACLs y
+handshakes como vocabulario conocido. Eso invalidó parte de las explicaciones y
+de las preguntas. `CLAUDE.md` actualizado con la calibración.
+
+### Glosario base (lo que faltaba definir)
+
+| Término | Definición llana |
+|---------|------------------|
+| Dirección IP | Número que identifica a un equipo en la red. Se configura, se cambia. |
+| Dirección MAC | Número grabado de fábrica en la tarjeta de red. No se cambia. |
+| Puerto | Número que identifica **qué programa** dentro del equipo (80 web, 443 web segura, 3389 escritorio remoto). Nada que ver con puertos físicos. |
+| Subred | Grupo de equipos que se hablan directamente. "Un barrio". |
+| Gateway | La salida del barrio. Normalmente un router. |
+| Switch | Reparte tráfico **dentro** de un barrio. |
+| Router | Conecta **barrios distintos**. |
+| VLAN | Barrio virtual, creado por configuración. |
+| Wireshark | Programa que captura el tráfico y lo muestra línea por línea. |
+| up/up | Estado de puerto en un switch. 1º up = hay señal. 2º up = los datos se entienden. |
+| Tabla MAC | Lista del switch: "por este puerto tengo a este equipo". |
+| Handshake TCP | Saludo de 3 pasos: SYN ("¿hablamos?"), SYN-ACK ("sí"), ACK ("empiezo"). |
+| ACL | Lista de reglas de permitir/denegar. Un filtro. |
+| SVI | IP asignada a una VLAN dentro de un switch, para poder enrutar entre VLANs. |
+| PDU | Nombre que recibe el paquetito de datos en cada capa. |
+
+### Re-explicación: la analogía postal
+
+Enviar un documento a una persona concreta de una empresa en otra ciudad.
+
+- **L7 Aplicación** — el documento en sí. El contenido.
+- **L6 Presentación** — el idioma en que está escrito y el sobre lacrado (cifrado).
+- **L5 Sesión** — la correspondencia: abrirla, mantenerla, cerrarla.
+- **L4 Transporte** — el **departamento** dentro del edificio (= puerto) y el tipo
+  de envío: TCP = certificado con acuse de recibo; UDP = carta normal al buzón.
+  Si el documento es largo, aquí se parte en trozos numerados.
+- **L3 Red** — la **dirección postal** de la ciudad destino (= IP).
+- **L2 Enlace** — el **camión de este tramo concreto** (= MAC). Cambia en cada
+  oficina de correos intermedia.
+- **L1 Física** — la carretera. Cable, fibra, radio.
+
+**Concepto central del Día 1:**
+> La IP (L3) es el destino final y NO cambia en todo el trayecto.
+> La MAC (L2) es el vehículo del tramo actual y CAMBIA en cada salto.
+
+### Por qué las PDU cambian de nombre
+
+```
+Tus datos
+   ↓ L4 le pone el número de departamento (puerto)
+SEGMENTO  (o DATAGRAMA si es UDP)
+   ↓ L3 le pone la dirección postal (IP)
+PAQUETE
+   ↓ L2 le pone la matrícula del camión (MAC)
+TRAMA
+   ↓ L1 lo convierte en señal
+BITS
+```
+
+### Modelo TCP/IP — con lógica, no con tabla
+
+OSI tiene 7 capas y es teórico. TCP/IP tiene 4 y es el que se usa de verdad.
+TCP/IP no inventó nada: solo **agrupó** capas contiguas del OSI.
+
+```
+OSI (7 capas)              TCP/IP (4 capas)
+7 Aplicación   ┐
+6 Presentación ├──────►    APPLICATION
+5 Sesión       ┘
+4 Transporte   ───────►    TRANSPORT
+3 Red          ───────►    INTERNET
+2 Enlace       ┐
+1 Física       ┴──────►    NETWORK ACCESS
+```
+
+Ninguna capa se mueve, se salta ni aparece en dos grupos.
+
+**Regla de comprobación:** suma las capas de los 4 grupos y tiene que dar
+exactamente 7 sin repetir. 3 + 1 + 1 + 2 = 7.
+
+- Fallo P6: la L4 tiene grupo propio (Transport); no puede estar además en
+  Application — estaría en dos sitios a la vez.
+- Fallo P7: la L3 tiene grupo propio (Internet); Network Access es solo L2 + L1.
+
+### Fallo P3 — switch multicapa entre VLANs
+
+VLAN = barrio. Ir de la VLAN 10 a la VLAN 20 es ir **de un barrio a otro**, y eso
+exige mirar la dirección postal (IP) = **capa 3**. "Multicapa" significa que el
+switch, además de L2, sabe hacer L3.
+
+Andy respondió L4. Pista general: **si el enunciado no menciona puertos ni
+programas, la capa 4 casi nunca es la respuesta.**
+
+### Fallo P8 — RDP rechaza credenciales
+
+1. Ping responde -> la dirección postal funciona -> **L3 confirmada**.
+2. DNS resuelve -> el nombre se traduce bien.
+3. Handshake TCP completo al 3389 -> llegó al departamento y le abrieron ->
+   **L4 confirmada**.
+4. Credenciales rechazadas -> usuario y contraseña son parte de la conversación
+   **del programa** -> **L7**.
+
+Andy respondió L6 porque "credenciales" suena a seguridad. Pero L6 sería un fallo
+de cifrado: contenido ilegible o desacuerdo en cómo cifrar. Aquí el mensaje llegó
+perfectamente legible y el servidor **decidió** rechazarlo. Decisión de
+aplicación = L7.
+
+### Reglas maestras (versión sin jerga)
+
+**¿Qué dato tiene que mirar para hacer su trabajo?**
+
+| Si mira... | Capa |
+|------------|------|
+| Contenido del programa (usuario/contraseña, dirección web, nombre del sitio) | 7 |
+| Número de puerto (80, 443, 3389) | 4 |
+| Dirección IP | 3 |
+| Dirección MAC | 2 |
+| Nada, solo mueve señal | 1 |
+
+**En escenarios de avería:** solo está confirmado lo que terminó su trabajo
+completo, y nunca funciona algo de arriba si algo de abajo falló. Ping que
+responde = capa 3 confirmada, ni una más.
+
+## Comprobación final (6 preguntas)
+
+1. Un mensaje viaja de Madrid a Chicago pasando por varios routers. ¿Qué ocurre
+   con las direcciones durante el trayecto?
+   a) La IP y la MAC cambian en cada salto
+   b) La IP se mantiene de extremo a extremo; la MAC cambia en cada salto
+   c) La MAC se mantiene de extremo a extremo; la IP cambia en cada salto
+   d) Ni la IP ni la MAC cambian
+
+2. Una llamada de voz por internet usa UDP. ¿Cómo se llama su PDU de capa 4?
+   a) Segmento  b) Paquete  c) Datagrama  d) Trama
+
+3. Sumando las capas OSI que agrupa cada capa de TCP/IP, ¿cuántas quedan
+   cubiertas en total?
+   a) 4  b) 5  c) 7  d) 9
+
+4. Un aparato decide hacia dónde enviar el tráfico mirando únicamente la IP de
+   destino. ¿En qué capa opera?
+   a) Capa 1  b) Capa 2  c) Capa 3  d) Capa 4
+
+5. Un usuario accede a una aplicación web, escribe su contraseña y el sistema
+   dice que es incorrecta. Todo lo demás funciona. ¿En qué capa está el fallo?
+   a) Capa 2  b) Capa 3  c) Capa 4  d) Capa 7
+
+6. Un técnico ve que un servidor responde al ping y concluye que su servicio de
+   correo funciona. ¿Por qué es incorrecto?
+   a) Porque el ping no funciona con servidores de correo
+   b) Porque el ping confirma alcanzabilidad por IP (capa 3), pero no dice nada
+      del programa de correo (capas 4 y 7)
+   c) Porque el ping confirma la capa 7 pero no las inferiores
+   d) Porque el correo no usa direcciones IP
+
 - Score: pendiente (Andy resuelve y reporta)
