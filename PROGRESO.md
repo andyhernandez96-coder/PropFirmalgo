@@ -103,6 +103,13 @@ configuración, sin troubleshooting, sin Wireshark ni CLI de equipos de red.
   los 5 dominios, para ir marcando lo que ya se domina. Generada desde el
   conocimiento del tutor, **no** copiada del PDF oficial: el PDF manda. Punto
   marcado como incierto: 802.11be / Wi-Fi 7.
+- `referencia/siglas-network-plus-n10-009.md` — ~170 siglas con expansión en
+  inglés y significado en español, agrupadas por tema. Incluye las 5 colisiones
+  peligrosas (PDU, STP, AD, EOS, MTTR) y las 25 prioritarias.
+
+**Principio de aprendizaje clave:** en muchas siglas la expansión ES la
+definición (UDP = User **Datagram** Protocol). Aprovecharlo siempre al introducir
+un protocolo nuevo: dar primero qué significan las letras.
 
 ## Nota de calendario
 
