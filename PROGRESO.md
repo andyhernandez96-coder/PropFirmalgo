@@ -97,6 +97,13 @@ configuración, sin troubleshooting, sin Wireshark ni CLI de equipos de red.
 7. **Confirmado vs. fallido** — nunca hay capa superior confirmada por encima de
    una capa que falló.
 
+## Material de referencia
+
+- `referencia/conceptos-network-plus-n10-009.md` — lista maestra de conceptos de
+  los 5 dominios, para ir marcando lo que ya se domina. Generada desde el
+  conocimiento del tutor, **no** copiada del PDF oficial: el PDF manda. Punto
+  marcado como incierto: 802.11be / Wi-Fi 7.
+
 ## Nota de calendario
 
 Con el punto de partida real (sin experiencia de configuración) y el ritmo del
