@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import { Notice } from './components/ui';
 import { useData } from './data';
 import { BankPage } from './pages/Bank';
+import { ExamResultsPage } from './pages/ExamResults';
 import { ImportPage } from './pages/Import';
 import { SessionPage } from './pages/Session';
 import { StudyPage } from './pages/Study';
 import { SummaryPage } from './pages/Summary';
 import type { SessionConfig, SessionResult } from './session';
 
-type Page = 'study' | 'bank' | 'import' | 'session' | 'summary';
-type NavPage = Exclude<Page, 'session' | 'summary'>;
+type Page = 'study' | 'bank' | 'import' | 'session' | 'summary' | 'results';
+type NavPage = Exclude<Page, 'session' | 'summary' | 'results'>;
 
 const NAV: { id: NavPage; label: string }[] = [
   { id: 'study', label: 'Study' },
@@ -32,7 +33,11 @@ export function App() {
   }, [inSession]);
 
   const go = (target: NavPage) => {
-    if (inSession && !window.confirm('Leave this session? Answers you already submitted are saved.')) return;
+    const warning =
+      config?.mode === 'exam'
+        ? 'Leave the exam? Your answers in this exam will be lost.'
+        : 'Leave this session? Answers you already submitted are saved.';
+    if (inSession && !window.confirm(warning)) return;
     setPage(target);
   };
 
@@ -45,7 +50,7 @@ export function App() {
 
   const finish = (r: SessionResult) => {
     setResult(r);
-    setPage('summary');
+    setPage(r.config.mode === 'exam' ? 'results' : 'summary');
   };
 
   return (
@@ -79,6 +84,8 @@ export function App() {
           <p className="text-muted">Loading…</p>
         ) : page === 'session' && config ? (
           <SessionPage key={config.questions.map((q) => q.id).join()} config={config} onFinish={finish} />
+        ) : page === 'results' && result ? (
+          <ExamResultsPage result={result} onBack={() => setPage('study')} />
         ) : page === 'summary' && result ? (
           <SummaryPage result={result} onBack={() => setPage('study')} />
         ) : page === 'bank' ? (

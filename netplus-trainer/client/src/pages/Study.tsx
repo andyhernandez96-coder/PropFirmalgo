@@ -1,8 +1,9 @@
 import { type ReactNode, useMemo, useState } from 'react';
-import { DOMAINS } from '../../../shared/domains';
+import { pickExamQuestions, allocateByWeight } from '../../../shared/distribution';
+import { DOMAINS, DOMAIN_IDS, type DomainId, EXAM_DEFAULT_MINUTES, EXAM_DEFAULT_QUESTIONS } from '../../../shared/domains';
 import { sample, shuffled } from '../../../shared/random';
 import { selectWeakSpots } from '../../../shared/stats';
-import { Button, Card, DomainSelect, inputClass, PageTitle } from '../components/ui';
+import { Button, Card, DomainSelect, inputClass, Notice, PageTitle } from '../components/ui';
 import { useData } from '../data';
 import type { SessionConfig } from '../session';
 
@@ -61,10 +62,69 @@ export function StudyPage({ onStart }: { onStart: (config: SessionConfig) => voi
     [questions, drillDomain, drillObjective],
   );
 
+  const [examCount, setExamCount] = useState(EXAM_DEFAULT_QUESTIONS);
+  const [examMinutes, setExamMinutes] = useState(EXAM_DEFAULT_MINUTES);
+  const examPreview = useMemo(() => {
+    const available = Object.fromEntries(
+      DOMAIN_IDS.map((d) => [d, questions.filter((q) => q.domain === d).length]),
+    ) as Record<DomainId, number>;
+    return allocateByWeight(examCount, available);
+  }, [questions, examCount]);
+
   return (
     <div>
       <PageTitle sub="Pick a mode. Every mode except the exam shows the answer and explanation right after you submit.">Study</PageTitle>
       <div className="grid gap-4">
+        <Card className="p-5 border-accent/60">
+          <h2 className="text-lg font-semibold">Exam Simulation</h2>
+          <p className="text-muted text-sm mb-4">
+            Questions split by the real domain weights, a countdown timer and no feedback until the end — like test day.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <CountInput value={examCount} onChange={setExamCount} max={questions.length} />
+            <label className="flex items-center gap-2">
+              <span className="text-sm text-muted">Minutes</span>
+              <input
+                type="number"
+                min={1}
+                className={`${inputClass} w-24`}
+                value={examMinutes}
+                onChange={(e) => setExamMinutes(Math.max(1, Number(e.target.value) || 1))}
+              />
+            </label>
+            <Button
+              variant="primary"
+              disabled={examPreview.total === 0}
+              onClick={() => {
+                const picked = pickExamQuestions(questions, examCount);
+                onStart({
+                  mode: 'exam',
+                  title: 'Exam Simulation',
+                  feedback: false,
+                  questions: picked.questions,
+                  timeLimitSec: examMinutes * 60,
+                });
+              }}
+            >
+              Start exam
+            </Button>
+          </div>
+          <p className="text-sm text-muted mt-3">
+            Mix: {DOMAINS.map((d) => `${d.id} → ${examPreview.perDomain[d.id]}`).join(' · ')}
+          </p>
+          {examPreview.warnings.length > 0 && (
+            <div className="mt-3">
+              <Notice tone="warn">
+                <ul className="list-disc ml-5 text-sm">
+                  {examPreview.warnings.map((w, i) => (
+                    <li key={i}>{w}</li>
+                  ))}
+                </ul>
+              </Notice>
+            </div>
+          )}
+        </Card>
+
         <ModeCard title="Practice" description="Random questions with immediate feedback.">
           <DomainSelect value={practiceDomain} onChange={setPracticeDomain} allowAll />
           <CountInput value={practiceCount} onChange={setPracticeCount} max={practicePool.length} />
