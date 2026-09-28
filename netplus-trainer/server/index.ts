@@ -43,10 +43,20 @@ async function main() {
   });
 
   // Only reachable from this computer.
-  app.listen(PORT, '127.0.0.1', () => {
+  // Express 5 also calls this callback with the error when listening fails; the 'error' handler below reports it.
+  const server = app.listen(PORT, '127.0.0.1', (err?: Error) => {
+    if (err) return;
     console.log(`[api] ready on http://127.0.0.1:${PORT}`);
     console.log(`[api] your data lives in ${DATA_DIR}`);
     console.log(`[api] drop .json files into ${INBOX_DIR} to import them automatically`);
+  });
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`[api] Port ${PORT} is already in use. The app is probably already open in another window: close that one first (Ctrl + C).`);
+    } else {
+      console.error('[api] could not start the server:', err);
+    }
+    process.exit(1);
   });
 
   startInboxWatcher(store);
