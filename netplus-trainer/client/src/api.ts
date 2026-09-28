@@ -1,4 +1,4 @@
-import type { Question } from '../../shared/schema';
+import type { Attempt, LeitnerCard, Question, Session } from '../../shared/schema';
 
 export class ApiError extends Error {
   constructor(public errors: string[], public status: number) {
@@ -56,6 +56,11 @@ export const api = {
     }),
   deleteQuestion: (id: string) => request<void>(`/questions/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   inboxLog: () => request<{ inboxDir: string; entries: InboxLogEntry[] }>('/inbox/log'),
+  progress: () => request<{ today: string; attempts: Attempt[]; leitner: Record<string, LeitnerCard> }>('/progress'),
+  postAttempts: (attempts: Attempt[]) =>
+    request<{ cards: Record<string, LeitnerCard> }>('/attempts', { method: 'POST', body: JSON.stringify({ attempts }) }),
+  sessions: () => request<{ sessions: Session[] }>('/sessions'),
+  postSession: (session: Session) => request<{ session: Session }>('/sessions', { method: 'POST', body: JSON.stringify(session) }),
 };
 
 export function errorText(err: unknown): string {

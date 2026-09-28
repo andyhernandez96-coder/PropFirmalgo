@@ -1,5 +1,6 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { inboxLog, startInboxWatcher } from './inbox';
+import { progressRouter } from './routes/progress';
 import { questionsRouter } from './routes/questions';
 import { DATA_DIR, INBOX_DIR, Store } from './store';
 
@@ -16,6 +17,7 @@ async function main() {
     res.json({ dataDir: DATA_DIR, inboxDir: INBOX_DIR });
   });
   app.use('/api/questions', questionsRouter(store));
+  app.use('/api', progressRouter(store));
   app.get('/api/inbox/log', (_req, res) => {
     res.json({ inboxDir: INBOX_DIR, entries: inboxLog() });
   });

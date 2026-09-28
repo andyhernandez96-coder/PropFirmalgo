@@ -1,9 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { localDay } from '../shared/dates';
 import { questionHash } from '../shared/hash';
+import { reviewCard } from '../shared/leitner';
 import { bankHashes, classifyBatch, toQuestion } from '../shared/importer';
 import {
+  type Attempt,
+  type LeitnerCard,
   type Progress,
   ProgressSchema,
   type Question,
@@ -210,5 +214,27 @@ export class Store {
       await this.saveProgress();
     }
     return true;
+  }
+
+  /** Stores answers and moves each question between Leitner boxes. */
+  async addAttempts(attempts: Attempt[]): Promise<Record<string, LeitnerCard>> {
+    const known = new Set(this.questions.map((q) => q.id));
+    const today = localDay();
+    const changed: Record<string, LeitnerCard> = {};
+    for (const attempt of attempts) {
+      this.progress.attempts.push(attempt);
+      if (!known.has(attempt.questionId)) continue;
+      const card = reviewCard(this.progress.leitner[attempt.questionId], attempt.correct, today);
+      this.progress.leitner[attempt.questionId] = card;
+      changed[attempt.questionId] = card;
+    }
+    await this.saveProgress();
+    return changed;
+  }
+
+  async addSession(session: Session): Promise<void> {
+    this.sessions = this.sessions.filter((s) => s.id !== session.id);
+    this.sessions.push(session);
+    await this.saveSessions();
   }
 }

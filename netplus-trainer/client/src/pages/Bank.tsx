@@ -7,7 +7,7 @@ import { QuestionEditor } from '../components/QuestionEditor';
 import { Badge, Button, Card, DomainBadge, DomainSelect, inputClass, Notice, PageTitle } from '../components/ui';
 
 export function BankPage() {
-  const { questions, reload } = useData();
+  const { questions, stats, reload } = useData();
   const [search, setSearch] = useState('');
   const [domain, setDomain] = useState('');
   const [objective, setObjective] = useState('');
@@ -103,6 +103,16 @@ export function BankPage() {
                 {q.tags?.map((t) => (
                   <Badge key={t}>#{t}</Badge>
                 ))}
+                {(() => {
+                  const s = stats.get(q.id);
+                  if (!s) return <Badge>not answered yet</Badge>;
+                  const tone = s.correct === s.attempts ? 'good' : s.correct === 0 ? 'bad' : 'warn';
+                  return (
+                    <Badge tone={tone}>
+                      {s.correct}/{s.attempts} correct
+                    </Badge>
+                  );
+                })()}
                 <div className="ml-auto flex gap-1">
                   <Button size="sm" variant="ghost" onClick={() => toggle(q.id)}>
                     {isOpen ? 'Hide' : 'Show'}
