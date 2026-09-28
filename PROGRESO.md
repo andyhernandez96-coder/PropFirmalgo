@@ -107,6 +107,10 @@ configuración, sin troubleshooting, sin Wireshark ni CLI de equipos de red.
   inglés y significado en español, agrupadas por tema. Incluye las 5 colisiones
   peligrosas (PDU, STP, AD, EOS, MTTR) y las 25 prioritarias.
 
+- `netplus-trainer/` — app local de práctica (Practice, Weak Spots, Domain Drill,
+  Spaced Repetition y Exam Simulation). Importa las preguntas de las sesiones del
+  tutor pegando el texto en Import → Paste text. Instrucciones en su `README.md`.
+
 **Principio de aprendizaje clave:** en muchas siglas la expansión ES la
 definición (UDP = User **Datagram** Protocol). Aprovecharlo siempre al introducir
 un protocolo nuevo: dar primero qué significan las letras.
