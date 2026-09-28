@@ -1,5 +1,6 @@
+import { dueQuestionIds } from '../../shared/leitner';
 import type { DomainId } from '../../shared/domains';
-import type { Mode, Question, Session } from '../../shared/schema';
+import type { LeitnerCard, Mode, Question, Session } from '../../shared/schema';
 import type { PresentedQuestion } from '../../shared/shuffle';
 
 export interface SessionConfig {
@@ -35,4 +36,16 @@ export function newSessionId(): string {
 
 export function domainOf(item: SessionItemResult): DomainId {
   return item.presented.question.domain;
+}
+
+
+/** Every question due for review today, lowest Leitner box first. */
+export function buildSrsConfig(questions: Question[], leitner: Record<string, LeitnerCard>, today: string): SessionConfig {
+  const byId = new Map(questions.map((q) => [q.id, q]));
+  const due = dueQuestionIds(leitner, today, new Set(byId.keys())).map((id) => byId.get(id)!);
+  return { mode: 'srs', title: 'Spaced Repetition', feedback: true, questions: due };
+}
+
+export function countDue(questions: Question[], leitner: Record<string, LeitnerCard>, today: string): number {
+  return dueQuestionIds(leitner, today, new Set(questions.map((q) => q.id))).length;
 }

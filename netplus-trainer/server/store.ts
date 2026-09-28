@@ -7,6 +7,7 @@ import { reviewCard } from '../shared/leitner';
 import { bankHashes, classifyBatch, toQuestion } from '../shared/importer';
 import {
   type Attempt,
+  type Backup,
   type LeitnerCard,
   type Progress,
   ProgressSchema,
@@ -22,6 +23,7 @@ export const DATA_DIR = path.resolve(process.env.NETPLUS_DATA_DIR ?? path.join(A
 export const INBOX_DIR = path.join(DATA_DIR, 'inbox');
 export const PROCESSED_DIR = path.join(INBOX_DIR, 'processed');
 export const FAILED_DIR = path.join(INBOX_DIR, 'failed');
+export const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
 const SEED_FILE = path.join(APP_ROOT, 'seed', 'seed-questions.json');
 
 const FILES = {
@@ -236,5 +238,29 @@ export class Store {
     this.sessions = this.sessions.filter((s) => s.id !== session.id);
     this.sessions.push(session);
     await this.saveSessions();
+  }
+
+  toBackup(): Backup {
+    return {
+      app: 'netplus-trainer',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      questions: this.questions,
+      progress: this.progress,
+      sessions: this.sessions,
+    };
+  }
+
+  /** Replaces everything. The previous data is saved first in data/backups/ in case of a mistake. */
+  async restore(backup: Backup): Promise<string> {
+    await fs.mkdir(BACKUPS_DIR, { recursive: true });
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const safetyCopy = path.join(BACKUPS_DIR, `before-restore-${stamp}.json`);
+    await writeFileAtomic(safetyCopy, JSON.stringify(this.toBackup(), null, 2));
+    this.questions = backup.questions;
+    this.progress = backup.progress;
+    this.sessions = backup.sessions;
+    await Promise.all([this.saveQuestions(), this.saveProgress(), this.saveSessions()]);
+    return safetyCopy;
   }
 }

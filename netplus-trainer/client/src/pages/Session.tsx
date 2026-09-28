@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { estimateScaledScore, pct, tallyByDomain } from '../../../shared/scoring';
-import type { Attempt, Session } from '../../../shared/schema';
+import type { Attempt, LeitnerCard, Session } from '../../../shared/schema';
+import { daysBetween, localDay } from '../../../shared/dates';
 import { isAnswerCorrect, presentQuestion, toOriginalIndexes } from '../../../shared/shuffle';
 import { api, errorText } from '../api';
+import { AskClaudeButton } from '../components/CopyButton';
 import { QuestionView } from '../components/QuestionView';
 import { Badge, Button, Card, Modal, Notice } from '../components/ui';
 import { useData } from '../data';
@@ -82,6 +84,7 @@ export function SessionPage({ config, onFinish }: { config: SessionConfig; onFin
   const [confirmFinish, setConfirmFinish] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [cards, setCards] = useState<Record<number, LeitnerCard>>({});
   const elapsed = useStopwatch(paused || finishing);
   const remaining = config.timeLimitSec !== undefined ? config.timeLimitSec - elapsed : undefined;
   const finished = useRef(false);
@@ -176,7 +179,14 @@ export function SessionPage({ config, onFinish }: { config: SessionConfig; onFin
       sessionId,
       answeredAt: new Date().toISOString(),
     };
-    api.postAttempts([attempt]).catch((err) => setSaveError(errorText(err)));
+    const at = index;
+    api
+      .postAttempts([attempt])
+      .then((r) => {
+        const card = r.cards[attempt.questionId];
+        if (card) setCards((prev) => ({ ...prev, [at]: card }));
+      })
+      .catch((err) => setSaveError(errorText(err)));
   };
 
   const goTo = (i: number) => {
@@ -307,6 +317,15 @@ export function SessionPage({ config, onFinish }: { config: SessionConfig; onFin
               {showExplanation && current.question.explanation && (
                 <div className="mt-4 border-l-2 border-accent pl-4 whitespace-pre-line">{current.question.explanation}</div>
               )}
+              {config.mode === 'srs' && cards[index] && (
+                <p className="mt-4 text-sm text-muted">
+                  Now in box {cards[index].box} of 5 · next review{' '}
+                  {(() => {
+                    const days = daysBetween(localDay(), cards[index].due);
+                    return days <= 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`;
+                  })()}
+                </p>
+              )}
             </div>
           )}
 
@@ -322,6 +341,7 @@ export function SessionPage({ config, onFinish }: { config: SessionConfig; onFin
             {isSubmitted && (current.question.explanation || current.optionExplanations) && (
               <Button onClick={() => setShowExplanation((s) => !s)}>{showExplanation ? 'Hide' : 'Show'} explanation (E)</Button>
             )}
+            {isSubmitted && <AskClaudeButton presented={current} selected={selected} answered />}
             <Button variant="primary" className="ml-auto" disabled={finishing} onClick={primary}>
               {primaryLabel}
             </Button>

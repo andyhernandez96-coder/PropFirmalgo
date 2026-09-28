@@ -5,7 +5,8 @@ import { sample, shuffled } from '../../../shared/random';
 import { selectWeakSpots } from '../../../shared/stats';
 import { Button, Card, DomainSelect, inputClass, Notice, PageTitle } from '../components/ui';
 import { useData } from '../data';
-import type { SessionConfig } from '../session';
+import { buildSrsConfig, countDue, type SessionConfig } from '../session';
+import { BOX_INTERVAL_DAYS } from '../../../shared/leitner';
 
 function CountInput({ value, onChange, max }: { value: number; onChange: (n: number) => void; max: number }) {
   return (
@@ -35,7 +36,13 @@ function ModeCard({ title, description, children }: { title: string; description
 }
 
 export function StudyPage({ onStart }: { onStart: (config: SessionConfig) => void }) {
-  const { questions, stats } = useData();
+  const { questions, stats, leitner, today } = useData();
+  const due = countDue(questions, leitner, today);
+  const nextDue = Object.entries(leitner)
+    .filter(([id]) => questions.some((q) => q.id === id))
+    .map(([, c]) => c.due)
+    .filter((d) => d > today)
+    .sort()[0];
 
   const [practiceCount, setPracticeCount] = useState(20);
   const [practiceDomain, setPracticeDomain] = useState('');
@@ -124,6 +131,20 @@ export function StudyPage({ onStart }: { onStart: (config: SessionConfig) => voi
             </div>
           )}
         </Card>
+
+        <ModeCard
+          title="Spaced Repetition"
+          description={`Leitner system with 5 boxes (review after ${BOX_INTERVAL_DAYS.join(', ')} days). Right answers move a question up a box; a miss sends it back to box 1. Questions join the schedule the first time you answer them.`}
+        >
+          <Button variant="primary" disabled={due === 0} onClick={() => onStart(buildSrsConfig(questions, leitner, today))}>
+            {due} due today
+          </Button>
+          {due === 0 && (
+            <span className="text-sm text-muted">
+              {nextDue ? `Nothing due. Next review: ${nextDue}.` : 'Nothing scheduled yet — answer some questions first.'}
+            </span>
+          )}
+        </ModeCard>
 
         <ModeCard title="Practice" description="Random questions with immediate feedback.">
           <DomainSelect value={practiceDomain} onChange={setPracticeDomain} allowAll />

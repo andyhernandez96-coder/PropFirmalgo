@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Notice } from './components/ui';
 import { useData } from './data';
 import { BankPage } from './pages/Bank';
+import { DashboardPage } from './pages/Dashboard';
+import { SettingsPage } from './pages/Settings';
 import { ExamResultsPage } from './pages/ExamResults';
 import { ImportPage } from './pages/Import';
 import { SessionPage } from './pages/Session';
@@ -9,18 +11,20 @@ import { StudyPage } from './pages/Study';
 import { SummaryPage } from './pages/Summary';
 import type { SessionConfig, SessionResult } from './session';
 
-type Page = 'study' | 'bank' | 'import' | 'session' | 'summary' | 'results';
+type Page = 'dashboard' | 'study' | 'bank' | 'import' | 'settings' | 'session' | 'summary' | 'results';
 type NavPage = Exclude<Page, 'session' | 'summary' | 'results'>;
 
 const NAV: { id: NavPage; label: string }[] = [
+  { id: 'dashboard', label: 'Dashboard' },
   { id: 'study', label: 'Study' },
   { id: 'bank', label: 'Question Bank' },
   { id: 'import', label: 'Import' },
+  { id: 'settings', label: 'Settings' },
 ];
 
 export function App() {
   const { error, loading } = useData();
-  const [page, setPage] = useState<Page>('study');
+  const [page, setPage] = useState<Page>('dashboard');
   const [config, setConfig] = useState<SessionConfig | null>(null);
   const [result, setResult] = useState<SessionResult | null>(null);
   const inSession = page === 'session';
@@ -92,6 +96,10 @@ export function App() {
           <BankPage />
         ) : page === 'import' ? (
           <ImportPage />
+        ) : page === 'settings' ? (
+          <SettingsPage />
+        ) : page === 'dashboard' ? (
+          <DashboardPage onStart={start} />
         ) : (
           <StudyPage onStart={start} />
         )}

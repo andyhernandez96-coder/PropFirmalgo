@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PASSING_SCALED } from '../../../shared/scoring';
 import { DomainBars } from '../components/DomainBars';
+import { AskClaudeButton } from '../components/CopyButton';
 import { OptionReview } from '../components/OptionReview';
 import { Badge, Button, Card, DomainBadge, Notice, PageTitle, Tabs } from '../components/ui';
 import { formatDuration } from '../format';
@@ -97,6 +98,9 @@ export function ExamResultsPage({ result, onBack }: { result: SessionResult; onB
                 <Badge tone="warn">Not answered</Badge>
               )}
               {it.flagged && <Badge tone="warn">⚑ Flagged</Badge>}
+              <div className="ml-auto">
+                <AskClaudeButton size="sm" presented={it.presented} selected={it.selected} answered={it.answered} />
+              </div>
             </div>
             <p className="whitespace-pre-line mb-3">{it.presented.question.question}</p>
             <OptionReview

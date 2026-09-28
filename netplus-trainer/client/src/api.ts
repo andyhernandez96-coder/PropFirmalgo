@@ -1,4 +1,4 @@
-import type { Attempt, LeitnerCard, Question, Session } from '../../shared/schema';
+import type { Attempt, Backup, LeitnerCard, Question, Session } from '../../shared/schema';
 
 export class ApiError extends Error {
   constructor(public errors: string[], public status: number) {
@@ -61,7 +61,14 @@ export const api = {
     request<{ cards: Record<string, LeitnerCard> }>('/attempts', { method: 'POST', body: JSON.stringify({ attempts }) }),
   sessions: () => request<{ sessions: Session[] }>('/sessions'),
   postSession: (session: Session) => request<{ session: Session }>('/sessions', { method: 'POST', body: JSON.stringify(session) }),
+  restoreBackup: (backup: Backup) =>
+    request<{ questions: number; attempts: number; sessions: number; safetyCopy: string }>('/backup/restore', {
+      method: 'POST',
+      body: JSON.stringify(backup),
+    }),
 };
+
+export const BACKUP_DOWNLOAD_URL = '/api/backup';
 
 export function errorText(err: unknown): string {
   if (err instanceof ApiError) return err.errors.join(' · ');

@@ -1,5 +1,6 @@
 import { DOMAINS } from '../../../shared/domains';
 import { MODE_LABELS } from '../../../shared/schema';
+import { AskClaudeButton } from '../components/CopyButton';
 import { OptionReview } from '../components/OptionReview';
 import { Badge, Button, Card, DomainBadge, Notice, PageTitle } from '../components/ui';
 import { formatDuration } from '../format';
@@ -68,6 +69,9 @@ export function SummaryPage({ result, onBack }: { result: SessionResult; onBack:
                   <DomainBadge domain={it.presented.question.domain} />
                   {it.correct ? <Badge tone="good">Correct</Badge> : <Badge tone="bad">Missed</Badge>}
                   {it.flagged && <Badge tone="warn">⚑ Flagged</Badge>}
+                <div className="ml-auto">
+                  <AskClaudeButton size="sm" presented={it.presented} selected={it.selected} answered={it.answered} />
+                </div>
                 </div>
                 <p className="whitespace-pre-line mb-3">{it.presented.question.question}</p>
                 <OptionReview
