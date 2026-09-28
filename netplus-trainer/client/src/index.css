@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 241 245 249;
+  --panel: 255 255 255;
+  --raised: 226 232 240;
+  --line: 203 213 225;
+  --ink: 15 23 42;
+  --muted: 71 85 105;
+  --accent: 37 99 235;
+  --accent-ink: 255 255 255;
+  --good: 21 128 61;
+  --bad: 185 28 28;
+  --warn: 161 98 7;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: 11 15 25;
+  --panel: 20 27 41;
+  --raised: 32 41 59;
+  --line: 51 63 85;
+  --ink: 226 232 240;
+  --muted: 148 163 184;
+  --accent: 59 130 246;
+  --accent-ink: 255 255 255;
+  --good: 74 222 128;
+  --bad: 248 113 113;
+  --warn: 250 204 21;
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+}
+
+body {
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+}

@@ -1,0 +1,293 @@
+[
+  {
+    "domain": "1.0",
+    "objective": "1.4",
+    "type": "single",
+    "question": "A technician needs to copy a configuration file to a switch using a lightweight protocol that runs over UDP port 69 and has no authentication. Which protocol is the technician using?",
+    "options": ["SFTP", "TFTP", "FTP", "SCP"],
+    "correct": [1],
+    "selectCount": 1,
+    "explanation": "TFTP (Trivial File Transfer Protocol) usa UDP 69 y no tiene autenticación ni cifrado. Es 'trivial' justamente por eso: solo copia archivos. Se usa mucho para cargar configuraciones y firmware en equipos de red.",
+    "optionExplanations": [
+      "SFTP (SSH File Transfer Protocol) va sobre SSH, puerto TCP 22, y sí autentica y cifra.",
+      "Correcta: TFTP = UDP 69, sin autenticación.",
+      "FTP (File Transfer Protocol) usa TCP 20/21 y pide usuario y contraseña (aunque sin cifrar).",
+      "SCP (Secure Copy Protocol) también va sobre SSH, TCP 22, con autenticación."
+    ],
+    "tags": ["ports", "protocols"],
+    "difficulty": "easy",
+    "source": "seed"
+  },
+  {
+    "domain": "1.0",
+    "objective": "1.1",
+    "type": "single",
+    "question": "Which OSI layer is responsible for logical addressing and for choosing the path between different networks?",
+    "options": ["Data link", "Network", "Transport", "Session"],
+    "correct": [1],
+    "selectCount": 1,
+    "explanation": "La capa 3 (Network, red) usa direcciones lógicas (IP) y decide por dónde enviar el tráfico entre redes distintas. Es la capa de los routers.",
+    "optionExplanations": [
+      "La capa 2 (enlace de datos) usa direcciones MAC y solo entrega dentro de la red local.",
+      "Correcta: capa 3 = IP y enrutamiento.",
+      "La capa 4 (transporte) usa puertos y se ocupa de la entrega fiable (TCP) o rápida (UDP), no del camino.",
+      "La capa 5 (sesión) abre, mantiene y cierra el diálogo entre dos equipos; no direcciona."
+    ],
+    "tags": ["osi"],
+    "difficulty": "easy",
+    "source": "seed"
+  },
+  {
+    "domain": "1.0",
+    "type": "multiple",
+    "question": "Which of the following address blocks are private IPv4 ranges defined in RFC 1918? (Choose TWO)",
+    "options": ["172.16.0.0/12", "169.254.0.0/16", "192.168.0.0/16", "100.64.0.0/10", "127.0.0.0/8"],
+    "correct": [0, 2],
+    "selectCount": 2,
+    "explanation": "RFC 1918 define tres rangos privados: 10.0.0.0/8, 172.16.0.0/12 y 192.168.0.0/16. No se enrutan en internet; para salir necesitan NAT (Network Address Translation, traducción de direcciones).",
+    "optionExplanations": [
+      "Correcta: 172.16.0.0 a 172.31.255.255 es privado (RFC 1918).",
+      "Es APIPA (Automatic Private IP Addressing): la dirección que se pone un equipo cuando no consigue respuesta de DHCP. No es RFC 1918.",
+      "Correcta: 192.168.0.0/16 es privado (RFC 1918).",
+      "Es el espacio compartido para CGNAT (NAT del operador, RFC 6598), no RFC 1918.",
+      "Es el rango de loopback: el equipo hablando consigo mismo. No es RFC 1918."
+    ],
+    "tags": ["ipv4", "addressing"],
+    "difficulty": "medium",
+    "source": "seed"
+  },
+  {
+    "domain": "2.0",
+    "type": "single",
+    "question": "Which IEEE 802.11 standard is marketed as Wi-Fi 6 and uses OFDMA to serve several clients at the same time?",
+    "options": ["802.11n", "802.11ac", "802.11ax", "802.11g"],
+    "correct": [2],
+    "selectCount": 1,
+    "explanation": "802.11ax es Wi-Fi 6 (y Wi-Fi 6E cuando añade la banda de 6 GHz). OFDMA (Orthogonal Frequency Division Multiple Access) divide el canal en trozos para atender a varios clientes en la misma transmisión.",
+    "optionExplanations": [
+      "802.11n es Wi-Fi 4: introdujo MIMO (varias antenas), no OFDMA.",
+      "802.11ac es Wi-Fi 5: solo 5 GHz y MU-MIMO de bajada, sin OFDMA.",
+      "Correcta: 802.11ax = Wi-Fi 6, con OFDMA.",
+      "802.11g es un estándar antiguo de 2.4 GHz a 54 Mbps."
+    ],
+    "tags": ["wireless", "802.11"],
+    "difficulty": "easy",
+    "source": "seed"
+  },
+  {
+    "domain": "2.0",
+    "type": "single",
+    "question": "A network administrator needs traffic from several VLANs to cross a single link between two switches. Which feature must be configured on that link?",
+    "options": ["Port mirroring", "802.1Q trunking", "Link aggregation (LACP)", "Power over Ethernet"],
+    "correct": [1],
+    "selectCount": 1,
+    "explanation": "Un trunk 802.1Q etiqueta cada trama con el número de su VLAN (Virtual Local Area Network), para que varias VLANs compartan el mismo cable entre switches y el otro extremo sepa a cuál pertenece cada trama.",
+    "optionExplanations": [
+      "Port mirroring copia el tráfico de un puerto a otro para analizarlo; no transporta VLANs.",
+      "Correcta: 802.1Q = etiquetado de VLANs en un trunk.",
+      "LACP (Link Aggregation Control Protocol) une varios cables en uno lógico para sumar velocidad y redundancia; no etiqueta VLANs.",
+      "PoE (Power over Ethernet) da electricidad por el cable de red; no tiene nada que ver con VLANs."
+    ],
+    "tags": ["switching", "vlan"],
+    "difficulty": "medium",
+    "source": "seed"
+  },
+  {
+    "domain": "2.0",
+    "type": "multiple",
+    "question": "Which of the following are non-overlapping channels in the 2.4 GHz band in North America? (Choose TWO)",
+    "options": ["1", "4", "6", "9"],
+    "correct": [0, 2],
+    "selectCount": 2,
+    "explanation": "En 2.4 GHz en Norteamérica solo hay tres canales que no se solapan: 1, 6 y 11. Los demás se pisan con sus vecinos y causan interferencia.",
+    "optionExplanations": [
+      "Correcta: el canal 1 es uno de los tres que no se solapan.",
+      "El canal 4 se solapa con el 1 y con el 6.",
+      "Correcta: el canal 6 es uno de los tres que no se solapan.",
+      "El canal 9 se solapa con el 6 y con el 11."
+    ],
+    "tags": ["wireless", "channels"],
+    "difficulty": "medium",
+    "source": "seed"
+  },
+  {
+    "domain": "3.0",
+    "type": "single",
+    "question": "After an outage, a company can tolerate losing at most four hours of data. Which metric describes this requirement?",
+    "options": ["RPO", "RTO", "MTTR", "MTBF"],
+    "correct": [0],
+    "selectCount": 1,
+    "explanation": "RPO (Recovery Point Objective, objetivo de punto de recuperación) mide cuántos datos puedes permitirte perder, expresado en tiempo hacia atrás desde el fallo. Marca cada cuánto tienes que hacer copias de seguridad.",
+    "optionExplanations": [
+      "Correcta: RPO = datos que puedes perder.",
+      "RTO (Recovery Time Objective) mide cuánto tiempo puedes estar caído hasta volver a funcionar, no cuántos datos pierdes.",
+      "MTTR (Mean Time To Repair) es el tiempo medio que se tarda en reparar algo.",
+      "MTBF (Mean Time Between Failures) es el tiempo medio entre una avería y la siguiente."
+    ],
+    "tags": ["dr", "availability"],
+    "difficulty": "easy",
+    "source": "seed"
+  },
+  {
+    "domain": "3.0",
+    "type": "single",
+    "question": "Which backup type copies every file changed since the last full backup, so a restore needs only the last full backup plus the most recent backup of this type?",
+    "options": ["Full", "Incremental", "Differential", "Snapshot"],
+    "correct": [2],
+    "selectCount": 1,
+    "explanation": "La diferencial copia todo lo que cambió desde la última completa. Cada día crece un poco más, pero para restaurar solo necesitas dos piezas: la completa y la última diferencial.",
+    "optionExplanations": [
+      "La completa copia todo siempre; no depende de copias anteriores.",
+      "La incremental copia solo lo cambiado desde la última copia de cualquier tipo; para restaurar necesitas la completa y TODAS las incrementales posteriores.",
+      "Correcta: diferencial = cambios desde la última completa.",
+      "Un snapshot es una foto del estado de un sistema o volumen en un momento concreto; no se define por 'cambios desde la última completa'."
+    ],
+    "tags": ["backup", "dr"],
+    "difficulty": "medium",
+    "source": "seed"
+  },
+  {
+    "domain": "3.0",
+    "type": "single",
+    "question": "Which SNMP message lets a device send an alert to the management station as soon as an event occurs, instead of waiting to be polled?",
+    "options": ["Get request", "Trap", "Set request", "Community string"],
+    "correct": [1],
+    "selectCount": 1,
+    "explanation": "SNMP (Simple Network Management Protocol) funciona de dos maneras: la estación de gestión pregunta (polling) o el dispositivo avisa por su cuenta con un trap. Los traps van al puerto UDP 162.",
+    "optionExplanations": [
+      "Un Get request es la estación de gestión preguntando por un dato: es polling, justo lo contrario.",
+      "Correcta: el trap es el aviso espontáneo del dispositivo.",
+      "Un Set request cambia un valor en el dispositivo; no es una alerta.",
+      "La community string es la 'contraseña' de SNMPv1/v2c, no un mensaje."
+    ],
+    "tags": ["monitoring", "snmp"],
+    "difficulty": "medium",
+    "source": "seed"
+  },
+  {
+    "domain": "4.0",
+    "type": "single",
+    "question": "An attacker sets up a wireless access point that broadcasts the same SSID as the company network in order to capture users' credentials. Which attack is this?",
+    "options": ["Rogue DHCP server", "Evil twin", "VLAN hopping", "MAC flooding"],
+    "correct": [1],
+    "selectCount": 1,
+    "explanation": "Un evil twin (gemelo malvado) imita el SSID (Service Set Identifier, el nombre visible de la red Wi-Fi) de una red legítima para que los usuarios se conecten a él y le entreguen su tráfico o sus credenciales.",
+    "optionExplanations": [
+      "Un servidor DHCP falso reparte configuraciones IP malas, pero no se hace pasar por la red Wi-Fi.",
+      "Correcta: mismo SSID falso = evil twin.",
+      "VLAN hopping es saltar de una VLAN a otra abusando de los trunks; no usa un punto de acceso falso.",
+      "MAC flooding llena la tabla MAC de un switch para que reenvíe todo por todos los puertos."
+    ],
+    "tags": ["attacks", "wireless"],
+    "difficulty": "easy",
+    "source": "seed"
+  },
+  {
+    "domain": "4.0",
+    "type": "single",
+    "question": "Which switch security feature checks ARP packets against the DHCP snooping binding table to stop ARP poisoning?",
+    "options": ["Port security", "DHCP snooping", "Dynamic ARP Inspection", "BPDU guard"],
+    "correct": [2],
+    "selectCount": 1,
+    "explanation": "DAI (Dynamic ARP Inspection) compara cada mensaje ARP con la tabla que construye DHCP snooping (qué IP y qué MAC hay en cada puerto) y descarta los que no cuadran. Así frena el ARP poisoning.",
+    "optionExplanations": [
+      "Port security limita qué direcciones MAC pueden usar un puerto; no valida mensajes ARP.",
+      "DHCP snooping construye la tabla de asociaciones y bloquea servidores DHCP falsos, pero no inspecciona ARP por sí solo.",
+      "Correcta: DAI valida ARP contra la tabla de DHCP snooping.",
+      "BPDU guard apaga un puerto si recibe mensajes de STP (Spanning Tree Protocol) donde no debería."
+    ],
+    "tags": ["hardening", "switching"],
+    "difficulty": "hard",
+    "source": "seed"
+  },
+  {
+    "domain": "4.0",
+    "type": "multiple",
+    "question": "Which of the following combinations are examples of multifactor authentication? (Choose TWO)",
+    "options": [
+      "Password and PIN",
+      "Password and a code from a hardware token",
+      "Fingerprint and a smart card",
+      "Security question and password",
+      "Username and password"
+    ],
+    "correct": [1, 2],
+    "selectCount": 2,
+    "explanation": "MFA (Multi-Factor Authentication) exige factores de categorías distintas: algo que sabes (contraseña, PIN), algo que tienes (token, tarjeta) y algo que eres (huella). Dos cosas de la misma categoría no son MFA.",
+    "optionExplanations": [
+      "Contraseña y PIN son las dos 'algo que sabes': un solo factor repetido.",
+      "Correcta: algo que sabes + algo que tienes.",
+      "Correcta: algo que eres + algo que tienes.",
+      "Pregunta de seguridad y contraseña son las dos 'algo que sabes'.",
+      "El nombre de usuario no es un factor de autenticación: solo te identifica."
+    ],
+    "tags": ["authentication"],
+    "difficulty": "medium",
+    "source": "seed"
+  },
+  {
+    "domain": "5.0",
+    "objective": "5.1",
+    "type": "single",
+    "question": "According to the CompTIA troubleshooting methodology, what should a technician do immediately after establishing a theory of probable cause?",
+    "options": [
+      "Implement the solution",
+      "Test the theory to determine the cause",
+      "Document findings, actions and outcomes",
+      "Establish a plan of action"
+    ],
+    "correct": [1],
+    "selectCount": 1,
+    "explanation": "El orden es: 1) identificar el problema, 2) establecer una teoría de la causa probable, 3) probar la teoría, 4) establecer un plan de acción, 5) implementar o escalar, 6) verificar el funcionamiento completo, 7) documentar.",
+    "optionExplanations": [
+      "Implementar es el paso 5; antes hay que confirmar la causa y planificar.",
+      "Correcta: después de la teoría viene probarla (paso 3).",
+      "Documentar es el último paso (7).",
+      "El plan de acción es el paso 4: solo tiene sentido cuando la teoría ya está confirmada."
+    ],
+    "tags": ["methodology"],
+    "difficulty": "easy",
+    "source": "seed"
+  },
+  {
+    "domain": "5.0",
+    "type": "single",
+    "question": "A user's workstation shows the IP address 169.254.23.10 and cannot reach any network resources. What is the MOST likely cause?",
+    "options": [
+      "The DNS server is down",
+      "Another host is using the same IP address",
+      "The workstation could not reach a DHCP server",
+      "The default gateway is misconfigured"
+    ],
+    "correct": [2],
+    "selectCount": 1,
+    "explanation": "Una dirección 169.254.x.x es APIPA (Automatic Private IP Addressing): el equipo se la pone a sí mismo cuando pide IP por DHCP y nadie le responde. Es el síntoma clásico de 'no hay DHCP'.",
+    "optionExplanations": [
+      "Un fallo de DNS impide traducir nombres, pero el equipo seguiría teniendo su IP normal de DHCP.",
+      "Una IP duplicada da conflictos intermitentes, pero no genera una dirección 169.254.",
+      "Correcta: 169.254 = APIPA = no respondió ningún servidor DHCP.",
+      "Un gateway mal configurado impide salir de la subred, pero el equipo tendría una IP normal."
+    ],
+    "tags": ["ip-config", "dhcp"],
+    "difficulty": "easy",
+    "source": "seed"
+  },
+  {
+    "domain": "5.0",
+    "type": "single",
+    "question": "Users report choppy VoIP calls. Continuous pings to the call server show response times that jump between 5 ms and 180 ms from one packet to the next, with no packets lost. Which issue BEST describes this?",
+    "options": ["Latency", "Jitter", "Packet loss", "Attenuation"],
+    "correct": [1],
+    "selectCount": 1,
+    "explanation": "Jitter es la variación del retardo entre un paquete y el siguiente. La voz lo sufre mucho porque necesita que los paquetes lleguen a ritmo constante. Aquí la pista es 'salta entre 5 y 180 ms'.",
+    "optionExplanations": [
+      "Latencia es el retardo en sí. Aquí lo llamativo no es que sea alto, sino que cambia muchísimo de un paquete a otro.",
+      "Correcta: variación del retardo = jitter.",
+      "El enunciado dice que no se pierde ningún paquete.",
+      "La atenuación es la pérdida de fuerza de la señal en el cable; se ve como errores o caídas del enlace, no como retardos que suben y bajan."
+    ],
+    "tags": ["performance", "voip"],
+    "difficulty": "medium",
+    "source": "seed"
+  }
+]
