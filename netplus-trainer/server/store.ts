@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { localDay } from '../shared/dates';
 import { questionHash } from '../shared/hash';
 import { reviewCard } from '../shared/leitner';
-import { bankHashes, classifyBatch, toQuestion } from '../shared/importer';
+import { bankHashes, classifyBatch, extractQuestionArray, toQuestion } from '../shared/importer';
 import {
   type Attempt,
   type Backup,
@@ -24,7 +24,10 @@ export const INBOX_DIR = path.join(DATA_DIR, 'inbox');
 export const PROCESSED_DIR = path.join(INBOX_DIR, 'processed');
 export const FAILED_DIR = path.join(INBOX_DIR, 'failed');
 export const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
-const SEED_FILE = path.join(APP_ROOT, 'seed', 'seed-questions.json');
+const SEED_DIR = path.join(APP_ROOT, 'seed');
+/** Seed file that installs from before seed tracking loaded on their first run. */
+const ORIGINAL_SEED = 'seed-questions.json';
+const SEEDS_APPLIED_FILE = path.join(DATA_DIR, 'seeds-applied.json');
 
 const FILES = {
   questions: path.join(DATA_DIR, 'questions.json'),
@@ -132,15 +135,13 @@ export class Store {
 
     const q = await readJson(FILES.questions);
     if (q.status === 'missing') {
-      const seed = JSON.parse(await fs.readFile(SEED_FILE, 'utf8')) as unknown[];
-      this.questions = classifyBatch(seed, new Set()).flatMap((r) => (r.status === 'valid' ? [r.question] : []));
       await this.saveQuestions();
-      console.log(`[store] first run: loaded ${this.questions.length} seed questions`);
     } else {
       if (q.status === 'corrupt') await quarantine(FILES.questions);
       this.questions = q.status === 'ok' ? validItems(q.value, QuestionSchema, 'question') : [];
       if (q.status === 'corrupt') await this.saveQuestions();
     }
+    await this.applySeeds(q.status === 'missing');
 
     const p = await readJson(FILES.progress);
     if (p.status === 'ok') {
@@ -159,6 +160,50 @@ export class Store {
     if (s.status === 'corrupt') await quarantine(FILES.sessions);
     this.sessions = s.status === 'ok' ? validItems(s.value, SessionSchema, 'session') : [];
     if (s.status !== 'ok') await this.saveSessions();
+  }
+
+  /**
+   * Adds each seed/*.json file to the bank once. Applied files are remembered in
+   * seeds-applied.json, so questions the user deletes do not come back.
+   */
+  private async applySeeds(firstRun: boolean): Promise<void> {
+    const marker = await readJson(SEEDS_APPLIED_FILE);
+    const applied = new Set<string>(
+      marker.status === 'ok' && Array.isArray(marker.value) ? marker.value.filter((v): v is string => typeof v === 'string') : [],
+    );
+    if (!firstRun && marker.status !== 'ok') applied.add(ORIGINAL_SEED);
+    const before = applied.size;
+
+    let files: string[] = [];
+    try {
+      files = (await fs.readdir(SEED_DIR)).filter((f) => f.endsWith('.json')).sort();
+    } catch (err) {
+      console.warn('[store] could not read the seed folder:', err);
+    }
+    let added = 0;
+    for (const file of files) {
+      if (applied.has(file)) continue;
+      let raws: unknown[] | null = null;
+      try {
+        raws = extractQuestionArray(JSON.parse(await fs.readFile(path.join(SEED_DIR, file), 'utf8')));
+      } catch (err) {
+        console.warn(`[store] seed ${file} could not be read:`, err);
+      }
+      if (!raws) continue;
+      const results = classifyBatch(raws, bankHashes(this.questions));
+      let count = 0;
+      for (const r of results) {
+        if (r.status === 'valid') {
+          this.questions.push(r.question);
+          count++;
+        }
+      }
+      added += count;
+      applied.add(file);
+      console.log(`[store] seed ${file}: added ${count} questions`);
+    }
+    if (added > 0) await this.saveQuestions();
+    if (applied.size !== before || marker.status !== 'ok') await writeFileAtomic(SEEDS_APPLIED_FILE, JSON.stringify([...applied], null, 2));
   }
 
   saveQuestions() {

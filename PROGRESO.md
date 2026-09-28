@@ -110,6 +110,8 @@ configuración, sin troubleshooting, sin Wireshark ni CLI de equipos de red.
 - `netplus-trainer/` — app local de práctica (Practice, Weak Spots, Domain Drill,
   Spaced Repetition y Exam Simulation). Importa las preguntas de las sesiones del
   tutor pegando el texto en Import → Paste text. Instrucciones en su `README.md`.
+  Trae un banco de 1015 preguntas (1000 en `seed/netplus-1000.json`, ponderadas
+  por dominio: 230/200/190/140/240). Preguntas en inglés, explicaciones en español.
 
 **Principio de aprendizaje clave:** en muchas siglas la expansión ES la
 definición (UDP = User **Datagram** Protocol). Aprovecharlo siempre al introducir

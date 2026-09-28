@@ -67,7 +67,11 @@ npm install
 
 **Para cerrar la app:** ve a la ventana de PowerShell y pulsa **Ctrl + C**. Si pregunta algo, escribe `S` o `Y` y pulsa Enter.
 
-La primera vez la app ya trae **15 preguntas de ejemplo** (3 por dominio) para que puedas probarla.
+La app ya trae un banco de **1015 preguntas** tipo examen: 15 de ejemplo + 1000 del archivo `seed/netplus-1000.json`, repartidas según el peso de cada dominio del N10-009 (Concepts 230, Implementation 200, Operations 190, Security 140, Troubleshooting 240).
+
+- Las preguntas están en **inglés** (como el examen) y las explicaciones en **español**.
+- Si ya usabas la app antes de esta actualización, las 1000 preguntas se añaden solas la próxima vez que la abras (después de `git pull`). No se duplica nada y tu progreso se mantiene.
+- Cada archivo de `seed/` se carga **una sola vez**. Si borras preguntas del banco, no vuelven a aparecer.
 
 ---
 
@@ -227,7 +231,8 @@ Borra la carpeta `node_modules` y el archivo `package-lock.json` (si existe) den
 - La nota de 100 a 900 es una **estimación**, no la escala oficial.
 - Dos preguntas con **exactamente el mismo texto** se consideran la misma, aunque tengan opciones distintas.
 - El Dashboard solo muestra "objetivos más débiles" si tus preguntas incluyen el campo `objective` (las que genera el prompt de la app lo incluyen cuando Claude está seguro del número).
-- Las 15 preguntas de ejemplo son originales y sirven para probar la app. Para un examen de 90 preguntas necesitas importar más.
+- Las 1000 preguntas del banco son originales (no son preguntas reales del examen). Cada una lleva el número de objetivo del N10-009 (por ejemplo `2.3`); esa numeración la puso Claude de memoria, así que compárala con tu PDF de objetivos oficiales si algo no te cuadra.
+- El banco trae 36 preguntas de subnetting de opción múltiple, pero no sustituye los drills a mano: esos siguen en SubnetSolver.
 
 ---
 
@@ -237,6 +242,7 @@ Borra la carpeta `node_modules` y el archivo `package-lock.json` (si existe) den
 npm run dev     # API (Express, puerto 3001) + web (Vite, puerto 5173)
 npm run test    # tests con vitest
 npm run build   # comprobación de tipos + build de producción
+npm run questions:build   # regenera seed/netplus-1000.json desde content/
 ```
 
 - `shared/`: schemas zod, parser de texto, barajado, reparto por dominios, Leitner, estadísticas y prompts. Lo usan el frontend y el backend.
